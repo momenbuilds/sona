@@ -95,14 +95,32 @@ export default function Home() {
       <main className="flex-1 flex flex-col">
         {view === "landing" && (
           <>
-            <section className="relative flex flex-col items-center justify-center overflow-hidden px-6 min-h-screen text-center">
+            <section className="relative flex flex-col items-start justify-center overflow-hidden px-6 sm:px-12 lg:px-20 min-h-[85vh] text-left">
               <HeroBackground />
 
-              <div className="relative max-w-4xl flex flex-col items-center gap-6 animate-fade-in-up">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/hand-mic.png"
+                alt=""
+                aria-hidden="true"
+                className="pointer-events-none select-none absolute -left-6 sm:left-0 bottom-0 w-[150px] sm:w-[200px] hidden sm:block"
+                style={{ mixBlendMode: "multiply" }}
+              />
+
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/bird-mascot.png"
+                alt=""
+                aria-hidden="true"
+                className="pointer-events-none select-none absolute right-[4%] top-[14%] w-[220px] sm:w-[300px] rotate-[6deg]"
+                style={{ mixBlendMode: "multiply" }}
+              />
+
+              <div className="relative max-w-xl flex flex-col items-start gap-6 animate-fade-in-up">
                 <span className="text-xs font-medium uppercase tracking-[0.2em] text-accent">
                   Voice pattern tracking
                 </span>
-                <h1 className="text-3xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05]">
+                <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-[1.08]">
                   <span className="block whitespace-nowrap">Your voice changes</span>
                   <span className="block whitespace-nowrap">
                     before you{" "}
@@ -111,7 +129,7 @@ export default function Home() {
                     </em>
                   </span>
                 </h1>
-                <p className="text-lg text-muted max-w-lg text-balance">
+                <p className="text-lg text-muted max-w-md">
                   Record {SESSION_TAKES} short takes back to back. Sona compares them and builds a
                   detailed picture of your speech patterns.
                 </p>
@@ -125,7 +143,7 @@ export default function Home() {
         )}
 
         {view === "record" && (
-          <section className="relative flex-1 flex flex-col items-center justify-center overflow-hidden px-6 pt-32 pb-16">
+          <section className="relative flex-1 flex flex-col items-center justify-center overflow-hidden px-6 py-16">
             <AmbientGlow />
             <Recorder
               onAnalyze={handleAnalyze}
@@ -137,7 +155,7 @@ export default function Home() {
         )}
 
         {view === "takeComplete" && (
-          <section className="relative flex-1 flex flex-col items-center justify-center overflow-hidden px-6 pt-32 pb-16">
+          <section className="relative flex-1 flex flex-col items-center justify-center overflow-hidden px-6 py-16">
             <AmbientGlow />
             <TakeComplete
               takeIndex={sessionTake}
@@ -149,7 +167,7 @@ export default function Home() {
         )}
 
         {view === "result" && result && (
-          <section className="flex-1 px-6 pt-28 pb-10">
+          <section className="flex-1 px-6 py-10">
             <ResultsView
               current={result.current}
               baseline={result.baseline}
@@ -196,6 +214,7 @@ function HeroBackground() {
         src="/hero-illustration.png"
         alt=""
         className="absolute inset-0 h-full w-full object-cover"
+        style={{ objectPosition: "85% 30%" }}
       />
       <div
         className="absolute inset-x-0 bottom-0 h-24"
