@@ -13,7 +13,7 @@ export default function Header({ onHome, onStart, showNav }: HeaderProps) {
   const [announcementDismissed, setAnnouncementDismissed] = useState(false);
 
   return (
-    <div className="sticky top-0 z-40 flex flex-col items-center">
+    <div className="fixed inset-x-0 top-0 z-40 flex flex-col items-center">
       {!announcementDismissed && (
         <div className="relative flex w-full items-center justify-center bg-accent px-10 py-2 text-center text-xs sm:text-sm font-medium text-white">
           <span>

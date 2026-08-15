@@ -4,13 +4,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Waveform from "./Waveform";
 import Button from "./Button";
 import { LiveTranscriber, isSpeechRecognitionSupported } from "@/lib/speechRecognition";
-import { randomPrompt } from "@/lib/prompts";
 
 interface RecorderProps {
   onAnalyze: (blob: Blob, liveTranscript: string | null) => void;
   analyzing: boolean;
   takeIndex: number;
   takeTotal: number;
+  prompt: string | null;
 }
 
 type RecState = "idle" | "recording" | "reviewing";
@@ -21,13 +21,14 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-export default function Recorder({ onAnalyze, analyzing, takeIndex, takeTotal }: RecorderProps) {
+export default function Recorder({ onAnalyze, analyzing, takeIndex, takeTotal, prompt }: RecorderProps) {
   const [state, setState] = useState<RecState>("idle");
   const [elapsed, setElapsed] = useState(0);
-  const [prompt, setPrompt] = useState<string | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
+  const [transcriptSupported, setTranscriptSupported] = useState(true);
+  const [liveWordCount, setLiveWordCount] = useState(0);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -93,17 +94,21 @@ export default function Recorder({ onAnalyze, analyzing, takeIndex, takeTotal }:
       mediaRecorderRef.current = recorder;
       recorder.start();
 
-      if (isSpeechRecognitionSupported()) {
+      const speechSupported = isSpeechRecognitionSupported();
+      setTranscriptSupported(speechSupported);
+      setLiveWordCount(0);
+      if (speechSupported) {
         const transcriber = new LiveTranscriber();
         transcriber.start();
         transcriberRef.current = transcriber;
       }
 
-      setPrompt(randomPrompt());
       setElapsed(0);
       setState("recording");
       timerRef.current = window.setInterval(() => {
         setElapsed((e) => e + 1);
+        const captured = transcriberRef.current?.getTranscript() ?? "";
+        setLiveWordCount(captured.length > 0 ? captured.split(/\s+/).filter(Boolean).length : 0);
       }, 1000);
     } catch {
       setError("Microphone access is needed to record. Please allow access in your browser.");
@@ -224,6 +229,18 @@ export default function Recorder({ onAnalyze, analyzing, takeIndex, takeTotal }:
             </button>
           </div>
           <p className="text-xs text-muted">Recording, tap to stop</p>
+          {transcriptSupported ? (
+            <p className="text-xs text-muted/70 -mt-3">
+              {liveWordCount > 0
+                ? `Capturing your words: ${liveWordCount} so far`
+                : "Listening for speech..."}
+            </p>
+          ) : (
+            <p className="text-xs text-muted/70 -mt-3">
+              Live word tracking isn&apos;t available in this browser. Try Chrome or Edge for
+              word count and filler-word stats.
+            </p>
+          )}
         </div>
       )}
 
