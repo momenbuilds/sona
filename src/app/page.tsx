@@ -109,7 +109,7 @@ export default function Home() {
       <main className="flex-1 flex flex-col">
         {view === "landing" && (
           <>
-            <section className="relative flex flex-col items-center justify-center overflow-hidden px-6 sm:px-12 lg:px-20 min-h-[85vh] text-center">
+            <section className="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-6 sm:px-12 lg:px-20 min-h-screen text-center">
               <HeroBackground />
 
               {/* eslint-disable-next-line @next/next/no-img-element */}
