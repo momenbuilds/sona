@@ -1,5 +1,53 @@
 import { Baseline, CategoryScore, ChangeNote, MetricCategory, MetricKey, RecordingMetrics } from "./types";
 
+// Metrics that speech research has associated with cognitive decline
+// (pausing more, slowing down, losing word variety, word-finding trouble).
+// This is a trend flag over your own history, not a diagnosis and not a
+// probability. See buildCognitiveFlag below for how it's used.
+const COGNITIVE_SIGNALS: { key: MetricKey; label: string; concerningDirection: "up" | "down" }[] = [
+  { key: "avgPauseSec", label: "longer pauses", concerningDirection: "up" },
+  { key: "longPauseCount", label: "more long pauses", concerningDirection: "up" },
+  { key: "wpm", label: "a slower speaking pace", concerningDirection: "down" },
+  { key: "lexicalDiversity", label: "less word variety", concerningDirection: "down" },
+  { key: "repeatedWords", label: "more repeated words", concerningDirection: "up" },
+];
+
+export interface CognitiveFlag {
+  flagged: boolean;
+  matchedLabels: string[];
+}
+
+// Looks for a sustained trend across your recording history rather than
+// judging a single session, since one bad-mic or tired day shouldn't mean
+// anything on its own. Needs at least 4 recordings to say anything at all.
+export function buildCognitiveFlag(history: RecordingMetrics[]): CognitiveFlag | null {
+  if (history.length < 4) return null;
+
+  const sorted = [...history].sort((a, b) => a.timestamp - b.timestamp);
+  const mid = Math.floor(sorted.length / 2);
+  const earlier = sorted.slice(0, mid);
+  const recent = sorted.slice(mid);
+
+  const avg = (arr: RecordingMetrics[], key: MetricKey): number | null => {
+    const values = arr.map((r) => r[key]).filter((v): v is number => typeof v === "number");
+    if (values.length === 0) return null;
+    return values.reduce((a, b) => a + b, 0) / values.length;
+  };
+
+  const matched: string[] = [];
+  for (const signal of COGNITIVE_SIGNALS) {
+    const earlierAvg = avg(earlier, signal.key);
+    const recentAvg = avg(recent, signal.key);
+    if (earlierAvg === null || recentAvg === null || earlierAvg === 0) continue;
+
+    const diff = (recentAvg - earlierAvg) / Math.abs(earlierAvg);
+    const isConcerning = signal.concerningDirection === "up" ? diff > 0.15 : diff < -0.15;
+    if (isConcerning) matched.push(signal.label);
+  }
+
+  return { flagged: matched.length >= 3, matchedLabels: matched };
+}
+
 interface FeatureDef {
   key: MetricKey;
   category: MetricCategory;
@@ -158,6 +206,44 @@ export function buildInsights(changes: ChangeNote[]): string[] {
 // are always empty (no comparisons yet), and as a single-sentence fallback.
 export function buildExplanation(changes: ChangeNote[]): string {
   return buildInsights(changes).slice(0, 2).join(" ");
+}
+
+// A short, readable writeup of the whole session, meant to read like a
+// person explaining the numbers rather than a list of stats.
+export function buildNarrative(
+  score: number | null,
+  categoryScores: CategoryScore[],
+  changes: ChangeNote[],
+  enoughForComparisons: boolean
+): string {
+  if (!enoughForComparisons) {
+    return "This is early in your history, so there isn't enough of your own baseline yet to compare against. Record a few more times and this section will start explaining how each session compares to your normal pattern.";
+  }
+  if (score === null) return "";
+
+  const lead =
+    score >= 85
+      ? `Your Voice Stability score today is ${score}. That means your speech mostly matched how you usually sound.`
+      : score >= 70
+      ? `Your Voice Stability score today is ${score}. That's a bit different from your usual pattern, but not a big shift.`
+      : score >= 50
+      ? `Your Voice Stability score today is ${score}. That's noticeably different from how you usually sound.`
+      : `Your Voice Stability score today is ${score}. That's a significant shift from your recent recordings.`;
+
+  const categoryBits = categoryScores
+    .filter((c) => c.score !== null)
+    .map((c) => `${c.label.toLowerCase()} was ${c.status.toLowerCase().replace("notably different", "notably different than usual")}`);
+  const categorySentence = categoryBits.length > 0 ? `Breaking it down, ${categoryBits.join(", ")}.` : "";
+
+  const topChanges = changes.slice(0, 2).map((c) => describeChange(c));
+  const changeSentence =
+    topChanges.length > 0
+      ? `The biggest differences were that ${topChanges.join(", and ")}.`
+      : score < 85
+      ? "No single measurement stands out on its own, the difference is spread evenly across a few smaller things."
+      : "";
+
+  return [lead, categorySentence, changeSentence].filter(Boolean).join(" ");
 }
 
 function describeChange(c: ChangeNote): string {

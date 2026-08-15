@@ -1,5 +1,5 @@
 import { Baseline, MetricKey, RecordingMetrics } from "@/lib/types";
-import { StabilityResult, buildInsights, scoreLabel } from "@/lib/score";
+import { StabilityResult, buildCognitiveFlag, buildInsights, buildNarrative, scoreLabel } from "@/lib/score";
 import { PopulationResult } from "@/lib/population";
 import { BASELINE_MIN_COUNT } from "@/lib/storage";
 import StabilityGauge from "./StabilityGauge";
@@ -7,6 +7,8 @@ import MetricCard from "./MetricCard";
 import CategorySection from "./CategorySection";
 import InsightList from "./InsightList";
 import PopulationSection from "./PopulationSection";
+import AnalysisSummary from "./AnalysisSummary";
+import CognitiveHealthNote from "./CognitiveHealthNote";
 import HistoryChart from "./HistoryChart";
 import Button from "./Button";
 
@@ -58,6 +60,13 @@ export default function ResultsView({
   const hasBaseline = baseline.count > 0;
   const enoughForComparisons = baseline.count >= BASELINE_MIN_COUNT;
   const insights = enoughForComparisons ? buildInsights(stability.changes) : [];
+  const narrative = buildNarrative(
+    stability.score,
+    stability.categoryScores,
+    stability.changes,
+    enoughForComparisons
+  );
+  const cognitiveFlag = buildCognitiveFlag(history);
 
   const recentHistory = [...history].slice(-7);
   const sparkHistory = [...history].slice(-8);
@@ -112,6 +121,8 @@ export default function ResultsView({
         />
         <QuickStat label="Speaking time" value={`${speakingPercent}%`} />
       </div>
+
+      <AnalysisSummary text={narrative} />
 
       {insights.length > 0 && <InsightList insights={insights} />}
 
@@ -386,6 +397,8 @@ export default function ResultsView({
           Clear demo data
         </button>
       </div>
+
+      <CognitiveHealthNote flag={cognitiveFlag} />
 
       <p className="text-center text-xs text-muted max-w-md mx-auto">
         This is an experimental speech-pattern demo, not a medical diagnosis or a screening tool.
