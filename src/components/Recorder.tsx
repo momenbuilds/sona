@@ -156,9 +156,8 @@ export default function Recorder({ onAnalyze, analyzing, takeIndex, takeTotal }:
             onClick={startRecording}
             className="group relative flex h-28 w-28 items-center justify-center rounded-full text-white transition hover:scale-105 hover:brightness-[1.08] active:scale-95"
             style={{
-              background: "linear-gradient(180deg, #8b7cf0 0%, #6d5ce6 55%, #5a48d6 100%)",
-              boxShadow:
-                "inset 0 1.5px 0 rgba(255,255,255,0.55), inset 0 -3px 6px rgba(38,25,120,0.35), 0 14px 28px -6px rgba(93,72,214,0.55)",
+              background: "linear-gradient(180deg, #f4823f 0%, #f2601f 100%)",
+              boxShadow: "0 6px 0 0 #c94c15, 0 16px 28px -6px rgba(242,96,31,0.5)",
             }}
             aria-label="Start recording"
           >

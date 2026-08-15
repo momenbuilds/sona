@@ -93,13 +93,13 @@ function Sparkline({ values }: { values: number[] }) {
     <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-11" preserveAspectRatio="none" aria-hidden="true">
       <defs>
         <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#6d5ce6" stopOpacity="0.22" />
-          <stop offset="100%" stopColor="#6d5ce6" stopOpacity="0" />
+          <stop offset="0%" stopColor="#f2601f" stopOpacity="0.22" />
+          <stop offset="100%" stopColor="#f2601f" stopOpacity="0" />
         </linearGradient>
       </defs>
       <path d={areaPath} fill={`url(#${gradientId})`} />
-      <path d={linePath} fill="none" stroke="#6d5ce6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx={last[0]} cy={last[1]} r="2.6" fill="#6d5ce6" />
+      <path d={linePath} fill="none" stroke="#f2601f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx={last[0]} cy={last[1]} r="2.6" fill="#f2601f" />
     </svg>
   );
 }

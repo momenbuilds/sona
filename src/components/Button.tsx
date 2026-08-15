@@ -10,11 +10,10 @@ export default function Button({ size = "lg", className = "", style, ...props }:
   return (
     <button
       {...props}
-      className={`relative rounded-full font-semibold text-white transition active:scale-[0.96] active:brightness-95 hover:brightness-[1.08] ${sizeClasses} ${className}`}
+      className={`relative rounded-xl font-semibold text-white transition active:translate-y-[2px] active:shadow-none hover:brightness-[1.05] ${sizeClasses} ${className}`}
       style={{
-        background: "linear-gradient(180deg, #8b7cf0 0%, #6d5ce6 55%, #5a48d6 100%)",
-        boxShadow:
-          "inset 0 1.5px 0 rgba(255,255,255,0.55), inset 0 -3px 6px rgba(38,25,120,0.35), 0 10px 24px -6px rgba(93,72,214,0.55), 0 2px 4px rgba(93,72,214,0.3)",
+        background: "linear-gradient(180deg, #f4823f 0%, #f2601f 100%)",
+        boxShadow: "0 4px 0 0 #c94c15, 0 8px 16px -4px rgba(242,96,31,0.4)",
         ...style,
       }}
     />

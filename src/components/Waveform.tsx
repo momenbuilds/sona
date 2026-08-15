@@ -45,8 +45,8 @@ export default function Waveform({ analyser, active }: WaveformProps) {
 
       ctx!.lineWidth = 2.5;
       const gradient = ctx!.createLinearGradient(0, 0, width, 0);
-      gradient.addColorStop(0, "#6d5ce6");
-      gradient.addColorStop(1, "#9b8afb");
+      gradient.addColorStop(0, "#f2601f");
+      gradient.addColorStop(1, "#f4a05f");
       ctx!.strokeStyle = gradient;
       ctx!.beginPath();
 

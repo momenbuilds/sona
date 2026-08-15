@@ -171,7 +171,7 @@ function AmbientGlow() {
       <div
         className="absolute left-1/2 top-[8%] h-[480px] w-[720px] -translate-x-1/2"
         style={{
-          background: "radial-gradient(circle, #6d5ce6 0%, transparent 65%)",
+          background: "radial-gradient(circle, #f2601f 0%, transparent 65%)",
           opacity: 0.1,
           filter: "blur(90px)",
         }}
@@ -179,7 +179,7 @@ function AmbientGlow() {
       <div
         className="absolute left-[75%] bottom-[5%] h-[380px] w-[560px] -translate-x-1/2"
         style={{
-          background: "radial-gradient(circle, #9b8afb 0%, transparent 65%)",
+          background: "radial-gradient(circle, #f4a05f 0%, transparent 65%)",
           opacity: 0.08,
           filter: "blur(90px)",
         }}

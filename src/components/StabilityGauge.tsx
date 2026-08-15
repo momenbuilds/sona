@@ -42,7 +42,7 @@ export default function StabilityGauge({
               cy="80"
               r={radius}
               fill="none"
-              stroke={building ? "#c3b8fb" : "url(#gaugeGradient)"}
+              stroke={building ? "#f8c9a0" : "url(#gaugeGradient)"}
               strokeWidth="10"
               strokeLinecap="round"
               strokeDasharray={circumference}
@@ -52,8 +52,8 @@ export default function StabilityGauge({
           )}
           <defs>
             <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#6d5ce6" />
-              <stop offset="100%" stopColor="#9b8afb" />
+              <stop offset="0%" stopColor="#f2601f" />
+              <stop offset="100%" stopColor="#f4a05f" />
             </linearGradient>
           </defs>
         </svg>

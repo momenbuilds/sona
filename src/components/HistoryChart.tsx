@@ -35,22 +35,22 @@ export default function HistoryChart({ points }: HistoryChartProps) {
     <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-36" preserveAspectRatio="none">
       <defs>
         <linearGradient id="historyFill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#6d5ce6" stopOpacity="0.16" />
-          <stop offset="100%" stopColor="#6d5ce6" stopOpacity="0" />
+          <stop offset="0%" stopColor="#f2601f" stopOpacity="0.16" />
+          <stop offset="100%" stopColor="#f2601f" stopOpacity="0" />
         </linearGradient>
       </defs>
       <path d={areaPath} fill="url(#historyFill)" />
       <path
         d={linePath}
         fill="none"
-        stroke="#6d5ce6"
+        stroke="#f2601f"
         strokeWidth="2.5"
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeDasharray="7 6"
       />
       {coords.map((c, i) => (
-        <circle key={i} cx={c.x} cy={c.y} r="3.5" fill="#6d5ce6" stroke="#fff" strokeWidth="1.5" />
+        <circle key={i} cx={c.x} cy={c.y} r="3.5" fill="#f2601f" stroke="#fff" strokeWidth="1.5" />
       ))}
     </svg>
   );
