@@ -14,10 +14,6 @@ interface SpeechRecognitionEventLike {
   results: ArrayLike<SpeechRecognitionResultLike>;
 }
 
-interface SpeechRecognitionErrorEventLike {
-  error: string;
-}
-
 interface SpeechRecognitionLike extends EventTarget {
   continuous: boolean;
   interimResults: boolean;
@@ -25,14 +21,9 @@ interface SpeechRecognitionLike extends EventTarget {
   start: () => void;
   stop: () => void;
   onresult: ((event: SpeechRecognitionEventLike) => void) | null;
-  onerror: ((event: SpeechRecognitionErrorEventLike) => void) | null;
+  onerror: ((event: unknown) => void) | null;
   onend: (() => void) | null;
 }
-
-// Errors that won't clear up on their own — restarting just spins in a
-// tight loop until stop() is called. Everything else (no-speech, network,
-// aborted) is transient and worth restarting for.
-const PERMANENT_ERRORS = new Set(["not-allowed", "audio-capture", "service-not-allowed"]);
 
 export function isSpeechRecognitionSupported(): boolean {
   if (typeof window === "undefined") return false;
@@ -83,13 +74,9 @@ export class LiveTranscriber {
       this.interimText = interim;
     };
 
-    recognition.onerror = (event) => {
-      // Swallow transient errors (no-speech, network, aborted) — onend
-      // fires right after and restarts recognition below. Permanent ones
-      // (mic permission revoked, hardware gone) won't clear up by
-      // retrying, so mark stopped to break the restart loop instead of
-      // spinning indefinitely.
-      if (PERMANENT_ERRORS.has(event.error)) this.stopped = true;
+    recognition.onerror = () => {
+      // Swallow errors (e.g. no-speech, network) — onend fires right after
+      // and restarts recognition below, so a transient error just resets it.
     };
 
     // Chrome's SpeechRecognition doesn't stay open for a full 60-90s take:

@@ -26,7 +26,7 @@ export default function Home() {
   const [analyzing, setAnalyzing] = useState(false);
   const [sessionTake, setSessionTake] = useState(1);
   const [takeScore, setTakeScore] = useState<number | null>(null);
-  const [usedPrompts, setUsedPrompts] = useState<string[]>([]);
+  const [, setUsedPrompts] = useState<string[]>([]);
   const [currentPrompt, setCurrentPrompt] = useState<string | null>(null);
   const [result, setResult] = useState<{
     current: RecordingMetrics;
@@ -74,11 +74,13 @@ export default function Home() {
 
   const handleContinueSession = useCallback(() => {
     setSessionTake((n) => n + 1);
-    const next = randomPrompt(usedPrompts);
-    setCurrentPrompt(next);
-    setUsedPrompts((used) => [...used, next]);
+    setUsedPrompts((used) => {
+      const next = randomPrompt(used);
+      setCurrentPrompt(next);
+      return [...used, next];
+    });
     setView("record");
-  }, [usedPrompts]);
+  }, []);
 
   const handleRecordAgain = useCallback(() => {
     setResult(null);
