@@ -1,5 +1,53 @@
 import { Baseline, CategoryScore, ChangeNote, MetricCategory, MetricKey, RecordingMetrics } from "./types";
 
+// Metrics that speech research has associated with cognitive decline
+// (pausing more, slowing down, losing word variety, word-finding trouble).
+// This is a trend flag over your own history, not a diagnosis and not a
+// probability. See buildCognitiveFlag below for how it's used.
+const COGNITIVE_SIGNALS: { key: MetricKey; label: string; concerningDirection: "up" | "down" }[] = [
+  { key: "avgPauseSec", label: "longer pauses", concerningDirection: "up" },
+  { key: "longPauseCount", label: "more long pauses", concerningDirection: "up" },
+  { key: "wpm", label: "a slower speaking pace", concerningDirection: "down" },
+  { key: "lexicalDiversity", label: "less word variety", concerningDirection: "down" },
+  { key: "repeatedWords", label: "more repeated words", concerningDirection: "up" },
+];
+
+export interface CognitiveFlag {
+  flagged: boolean;
+  matchedLabels: string[];
+}
+
+// Looks for a sustained trend across your recording history rather than
+// judging a single session, since one bad-mic or tired day shouldn't mean
+// anything on its own. Needs at least 4 recordings to say anything at all.
+export function buildCognitiveFlag(history: RecordingMetrics[]): CognitiveFlag | null {
+  if (history.length < 4) return null;
+
+  const sorted = [...history].sort((a, b) => a.timestamp - b.timestamp);
+  const mid = Math.floor(sorted.length / 2);
+  const earlier = sorted.slice(0, mid);
+  const recent = sorted.slice(mid);
+
+  const avg = (arr: RecordingMetrics[], key: MetricKey): number | null => {
+    const values = arr.map((r) => r[key]).filter((v): v is number => typeof v === "number");
+    if (values.length === 0) return null;
+    return values.reduce((a, b) => a + b, 0) / values.length;
+  };
+
+  const matched: string[] = [];
+  for (const signal of COGNITIVE_SIGNALS) {
+    const earlierAvg = avg(earlier, signal.key);
+    const recentAvg = avg(recent, signal.key);
+    if (earlierAvg === null || recentAvg === null || earlierAvg === 0) continue;
+
+    const diff = (recentAvg - earlierAvg) / Math.abs(earlierAvg);
+    const isConcerning = signal.concerningDirection === "up" ? diff > 0.15 : diff < -0.15;
+    if (isConcerning) matched.push(signal.label);
+  }
+
+  return { flagged: matched.length >= 3, matchedLabels: matched };
+}
+
 interface FeatureDef {
   key: MetricKey;
   category: MetricCategory;

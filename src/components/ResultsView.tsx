@@ -1,5 +1,5 @@
 import { Baseline, MetricKey, RecordingMetrics } from "@/lib/types";
-import { StabilityResult, buildInsights, buildNarrative, scoreLabel } from "@/lib/score";
+import { StabilityResult, buildCognitiveFlag, buildInsights, buildNarrative, scoreLabel } from "@/lib/score";
 import { BASELINE_MIN_COUNT } from "@/lib/storage";
 import StabilityGauge from "./StabilityGauge";
 import MetricCard from "./MetricCard";
@@ -62,6 +62,7 @@ export default function ResultsView({
     stability.changes,
     enoughForComparisons
   );
+  const cognitiveFlag = buildCognitiveFlag(history);
 
   const recentHistory = [...history].slice(-7);
   const sparkHistory = [...history].slice(-8);
@@ -391,7 +392,7 @@ export default function ResultsView({
         </button>
       </div>
 
-      <CognitiveHealthNote />
+      <CognitiveHealthNote flag={cognitiveFlag} />
 
       <p className="text-center text-xs text-muted max-w-md mx-auto">
         This is an experimental speech-pattern screening demo, not a medical diagnosis.
