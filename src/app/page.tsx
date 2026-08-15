@@ -15,6 +15,7 @@ import {
   saveRecording,
   SESSION_TAKES,
 } from "@/lib/storage";
+import { randomPrompt } from "@/lib/prompts";
 import { Baseline, RecordingMetrics } from "@/lib/types";
 
 type View = "landing" | "record" | "takeComplete" | "result";
@@ -24,6 +25,8 @@ export default function Home() {
   const [analyzing, setAnalyzing] = useState(false);
   const [sessionTake, setSessionTake] = useState(1);
   const [takeScore, setTakeScore] = useState<number | null>(null);
+  const [, setUsedPrompts] = useState<string[]>([]);
+  const [currentPrompt, setCurrentPrompt] = useState<string | null>(null);
   const [result, setResult] = useState<{
     current: RecordingMetrics;
     baseline: Baseline;
@@ -68,12 +71,20 @@ export default function Home() {
 
   const handleContinueSession = useCallback(() => {
     setSessionTake((n) => n + 1);
+    setUsedPrompts((used) => {
+      const next = randomPrompt(used);
+      setCurrentPrompt(next);
+      return [...used, next];
+    });
     setView("record");
   }, []);
 
   const handleRecordAgain = useCallback(() => {
     setResult(null);
     setSessionTake(1);
+    const next = randomPrompt();
+    setUsedPrompts([next]);
+    setCurrentPrompt(next);
     setView("record");
   }, []);
 
@@ -85,6 +96,9 @@ export default function Home() {
 
   const startSession = useCallback(() => {
     setSessionTake(1);
+    const next = randomPrompt();
+    setUsedPrompts([next]);
+    setCurrentPrompt(next);
     setView("record");
   }, []);
 
@@ -143,19 +157,20 @@ export default function Home() {
         )}
 
         {view === "record" && (
-          <section className="relative flex-1 flex flex-col items-center justify-center overflow-hidden px-6 py-16">
+          <section className="relative flex-1 flex flex-col items-center justify-center overflow-hidden px-6 pt-32 pb-16">
             <AmbientGlow />
             <Recorder
               onAnalyze={handleAnalyze}
               analyzing={analyzing}
               takeIndex={sessionTake}
               takeTotal={SESSION_TAKES}
+              prompt={currentPrompt}
             />
           </section>
         )}
 
         {view === "takeComplete" && (
-          <section className="relative flex-1 flex flex-col items-center justify-center overflow-hidden px-6 py-16">
+          <section className="relative flex-1 flex flex-col items-center justify-center overflow-hidden px-6 pt-32 pb-16">
             <AmbientGlow />
             <TakeComplete
               takeIndex={sessionTake}
@@ -167,7 +182,7 @@ export default function Home() {
         )}
 
         {view === "result" && result && (
-          <section className="flex-1 px-6 py-10">
+          <section className="flex-1 px-6 pt-32 pb-10">
             <ResultsView
               current={result.current}
               baseline={result.baseline}

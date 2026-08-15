@@ -6,6 +6,8 @@ export const SPEAKING_PROMPTS = [
   "Talk about something you're currently working on.",
 ];
 
-export function randomPrompt(): string {
-  return SPEAKING_PROMPTS[Math.floor(Math.random() * SPEAKING_PROMPTS.length)];
+export function randomPrompt(exclude: string[] = []): string {
+  const pool = SPEAKING_PROMPTS.filter((p) => !exclude.includes(p));
+  const options = pool.length > 0 ? pool : SPEAKING_PROMPTS;
+  return options[Math.floor(Math.random() * options.length)];
 }
