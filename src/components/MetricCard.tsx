@@ -61,9 +61,13 @@ export default function MetricCard({
         )}
       </div>
 
-      <div>
+      <div className="flex items-baseline gap-3">
         <p className="text-3xl font-semibold tabular-nums tracking-tight">{value}</p>
-        {baselineLabel && <p className="mt-1 text-xs text-muted/80">{baselineLabel}</p>}
+        {baselineLabel && (
+          <span className="border-l border-border pl-3 text-xs leading-tight text-muted/80">
+            {baselineLabel}
+          </span>
+        )}
       </div>
 
       {sparkline && sparkline.length >= 3 && <Sparkline values={sparkline} />}

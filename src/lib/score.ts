@@ -160,6 +160,44 @@ export function buildExplanation(changes: ChangeNote[]): string {
   return buildInsights(changes).slice(0, 2).join(" ");
 }
 
+// A short, readable writeup of the whole session, meant to read like a
+// person explaining the numbers rather than a list of stats.
+export function buildNarrative(
+  score: number | null,
+  categoryScores: CategoryScore[],
+  changes: ChangeNote[],
+  enoughForComparisons: boolean
+): string {
+  if (!enoughForComparisons) {
+    return "This is early in your history, so there isn't enough of your own baseline yet to compare against. Record a few more times and this section will start explaining how each session compares to your normal pattern.";
+  }
+  if (score === null) return "";
+
+  const lead =
+    score >= 85
+      ? `Your Voice Stability score today is ${score}. That means your speech mostly matched how you usually sound.`
+      : score >= 70
+      ? `Your Voice Stability score today is ${score}. That's a bit different from your usual pattern, but not a big shift.`
+      : score >= 50
+      ? `Your Voice Stability score today is ${score}. That's noticeably different from how you usually sound.`
+      : `Your Voice Stability score today is ${score}. That's a significant shift from your recent recordings.`;
+
+  const categoryBits = categoryScores
+    .filter((c) => c.score !== null)
+    .map((c) => `${c.label.toLowerCase()} was ${c.status.toLowerCase().replace("notably different", "notably different than usual")}`);
+  const categorySentence = categoryBits.length > 0 ? `Breaking it down, ${categoryBits.join(", ")}.` : "";
+
+  const topChanges = changes.slice(0, 2).map((c) => describeChange(c));
+  const changeSentence =
+    topChanges.length > 0
+      ? `The biggest differences were that ${topChanges.join(", and ")}.`
+      : score < 85
+      ? "No single measurement stands out on its own, the difference is spread evenly across a few smaller things."
+      : "";
+
+  return [lead, categorySentence, changeSentence].filter(Boolean).join(" ");
+}
+
 function describeChange(c: ChangeNote): string {
   const magnitude = Math.abs(c.percentDiff) >= 25 ? "notably" : "slightly";
   switch (c.key) {
