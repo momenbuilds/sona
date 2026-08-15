@@ -8,6 +8,7 @@ import InsightList from "./InsightList";
 import AnalysisSummary from "./AnalysisSummary";
 import CognitiveHealthNote from "./CognitiveHealthNote";
 import HistoryChart from "./HistoryChart";
+import ShareCardButton from "./ShareCardButton";
 import Button from "./Button";
 
 interface ResultsViewProps {
@@ -63,6 +64,9 @@ export default function ResultsView({
     enoughForComparisons
   );
   const cognitiveFlag = buildCognitiveFlag(history);
+
+  const historyWordCounts = history.map((r) => r.wordCount).filter((v): v is number => v !== null);
+  const totalWordsSpoken = historyWordCounts.length > 0 ? historyWordCounts.reduce((a, b) => a + b, 0) : null;
 
   const recentHistory = [...history].slice(-7);
   const sparkHistory = [...history].slice(-8);
@@ -342,6 +346,18 @@ export default function ResultsView({
         <Button size="md" onClick={onRecordAgain}>
           Record again
         </Button>
+        <ShareCardButton
+          data={{
+            score: enoughForComparisons ? stability.score : null,
+            scoreLabel:
+              enoughForComparisons && stability.score !== null
+                ? scoreLabel(stability.score)
+                : "Building your baseline",
+            wordCount: totalWordsSpoken,
+            wpm: current.wpm,
+            recordingCount: history.length,
+          }}
+        />
       </div>
 
       <div className="border-t border-border pt-8">

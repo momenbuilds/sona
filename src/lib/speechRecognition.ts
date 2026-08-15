@@ -38,9 +38,16 @@ export class LiveTranscriber {
   private recognition: SpeechRecognitionLike | null = null;
   private finalText = "";
   private interimText = "";
+  private stopped = false;
 
   start(): boolean {
     if (!isSpeechRecognitionSupported()) return false;
+    if (!this.createAndStart()) return false;
+    this.stopped = false;
+    return true;
+  }
+
+  private createAndStart(): boolean {
     const w = window as unknown as {
       SpeechRecognition?: SpeechRecognitionCtor;
       webkitSpeechRecognition?: SpeechRecognitionCtor;
@@ -68,8 +75,18 @@ export class LiveTranscriber {
     };
 
     recognition.onerror = () => {
-      // Swallow errors (e.g. no-speech, network) — we fall back to
-      // whatever transcript text has been captured so far.
+      // Swallow errors (e.g. no-speech, network) — onend fires right after
+      // and restarts recognition below, so a transient error just resets it.
+    };
+
+    // Chrome's SpeechRecognition doesn't stay open for a full 60-90s take:
+    // it ends on its own after a stretch of silence or a fixed timeout,
+    // even with continuous set. Without restarting here, most of a take
+    // gets silently dropped and the transcript comes back empty. So keep
+    // relaunching a fresh instance until stop() is called deliberately.
+    recognition.onend = () => {
+      if (this.stopped) return;
+      this.createAndStart();
     };
 
     try {
@@ -82,6 +99,7 @@ export class LiveTranscriber {
   }
 
   stop(): string {
+    this.stopped = true;
     this.recognition?.stop();
     return this.getTranscript();
   }
