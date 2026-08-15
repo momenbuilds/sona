@@ -232,7 +232,11 @@ export function buildNarrative(
 
   const categoryBits = categoryScores
     .filter((c) => c.score !== null)
-    .map((c) => `${c.label.toLowerCase()} was ${c.status.toLowerCase().replace("notably different", "notably different than usual")}`);
+    .map((c) => {
+      const status = c.status.toLowerCase();
+      const suffixed = status.includes("different") ? `${status} than usual` : status;
+      return `${c.label.toLowerCase()} was ${suffixed}`;
+    });
   const categorySentence = categoryBits.length > 0 ? `Breaking it down, ${categoryBits.join(", ")}.` : "";
 
   const topChanges = changes.slice(0, 2).map((c) => describeChange(c));

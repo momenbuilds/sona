@@ -26,7 +26,7 @@ export default function Home() {
   const [analyzing, setAnalyzing] = useState(false);
   const [sessionTake, setSessionTake] = useState(1);
   const [takeScore, setTakeScore] = useState<number | null>(null);
-  const [, setUsedPrompts] = useState<string[]>([]);
+  const [usedPrompts, setUsedPrompts] = useState<string[]>([]);
   const [currentPrompt, setCurrentPrompt] = useState<string | null>(null);
   const [result, setResult] = useState<{
     current: RecordingMetrics;
@@ -74,13 +74,11 @@ export default function Home() {
 
   const handleContinueSession = useCallback(() => {
     setSessionTake((n) => n + 1);
-    setUsedPrompts((used) => {
-      const next = randomPrompt(used);
-      setCurrentPrompt(next);
-      return [...used, next];
-    });
+    const next = randomPrompt(usedPrompts);
+    setCurrentPrompt(next);
+    setUsedPrompts((used) => [...used, next]);
     setView("record");
-  }, []);
+  }, [usedPrompts]);
 
   const handleRecordAgain = useCallback(() => {
     setResult(null);
@@ -112,7 +110,7 @@ export default function Home() {
       <main className="flex-1 flex flex-col">
         {view === "landing" && (
           <>
-            <section className="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-6 sm:px-12 lg:px-20 min-h-screen text-center">
+            <section className="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-6 pt-32 sm:px-12 lg:px-20 min-h-screen text-center">
               <HeroBackground />
 
               {/* eslint-disable-next-line @next/next/no-img-element */}

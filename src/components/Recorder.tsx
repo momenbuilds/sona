@@ -51,6 +51,13 @@ export default function Recorder({ onAnalyze, analyzing, takeIndex, takeTotal, p
       window.clearInterval(timerRef.current);
       timerRef.current = null;
     }
+    // Speech recognition doesn't depend on the getUserMedia stream above —
+    // it's the browser's own mic access, and it self-restarts on end (see
+    // LiveTranscriber). Without this, navigating away mid-recording (e.g.
+    // the header logo, which is clickable in every view) leaves it running
+    // and relaunching itself indefinitely in the background.
+    transcriberRef.current?.stop();
+    transcriberRef.current = null;
   }, []);
 
   useEffect(() => () => cleanupStream(), [cleanupStream]);
