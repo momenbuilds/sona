@@ -95,7 +95,7 @@ export default function Home() {
       <main className="flex-1 flex flex-col">
         {view === "landing" && (
           <>
-            <section className="relative flex flex-col items-start justify-center overflow-hidden px-6 sm:px-12 lg:px-20 min-h-[85vh] text-left">
+            <section className="relative flex flex-col items-center justify-center overflow-hidden px-6 sm:px-12 lg:px-20 min-h-[85vh] text-center">
               <HeroBackground />
 
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -116,7 +116,7 @@ export default function Home() {
                 style={{ mixBlendMode: "multiply" }}
               />
 
-              <div className="relative max-w-xl flex flex-col items-start gap-6 animate-fade-in-up">
+              <div className="relative max-w-xl mx-auto flex flex-col items-center gap-6 animate-fade-in-up">
                 <span className="text-xs font-medium uppercase tracking-[0.2em] text-accent">
                   Voice pattern tracking
                 </span>
@@ -129,7 +129,7 @@ export default function Home() {
                     </em>
                   </span>
                 </h1>
-                <p className="text-lg text-muted max-w-md">
+                <p className="text-lg text-muted max-w-md mx-auto">
                   Record {SESSION_TAKES} short takes back to back. Sona compares them and builds a
                   detailed picture of your speech patterns.
                 </p>
