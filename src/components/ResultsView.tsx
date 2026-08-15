@@ -1,10 +1,12 @@
 import { Baseline, MetricKey, RecordingMetrics } from "@/lib/types";
 import { StabilityResult, buildInsights, scoreLabel } from "@/lib/score";
+import { PopulationResult } from "@/lib/population";
 import { BASELINE_MIN_COUNT } from "@/lib/storage";
 import StabilityGauge from "./StabilityGauge";
 import MetricCard from "./MetricCard";
 import CategorySection from "./CategorySection";
 import InsightList from "./InsightList";
+import PopulationSection from "./PopulationSection";
 import HistoryChart from "./HistoryChart";
 import Button from "./Button";
 
@@ -12,6 +14,7 @@ interface ResultsViewProps {
   current: RecordingMetrics;
   baseline: Baseline;
   stability: StabilityResult;
+  population: PopulationResult;
   history: RecordingMetrics[];
   onRecordAgain: () => void;
   onClearData: () => void;
@@ -47,6 +50,7 @@ export default function ResultsView({
   current,
   baseline,
   stability,
+  population,
   history,
   onRecordAgain,
   onClearData,
@@ -327,6 +331,8 @@ export default function ResultsView({
         </p>
       )}
 
+      <PopulationSection result={population} />
+
       <div className="flex justify-center gap-3">
         <Button size="md" onClick={onRecordAgain}>
           Record again
@@ -382,7 +388,10 @@ export default function ResultsView({
       </div>
 
       <p className="text-center text-xs text-muted max-w-md mx-auto">
-        This is an experimental speech-pattern screening demo, not a medical diagnosis.
+        This is an experimental speech-pattern demo, not a medical diagnosis or a screening tool.
+        Both comparisons above — against your own history and against the small general-speech
+        sample — are statistical, not clinical. Neither measures cognitive health, dementia risk,
+        or any other clinical marker.
       </p>
     </div>
   );

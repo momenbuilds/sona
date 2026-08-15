@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { CategoryScore } from "@/lib/types";
 
 interface CategorySectionProps {
-  categoryScore: CategoryScore;
+  categoryScore: Pick<CategoryScore, "label" | "score" | "status">;
   children: ReactNode;
 }
 

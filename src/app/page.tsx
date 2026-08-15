@@ -8,6 +8,7 @@ import TakeComplete from "@/components/TakeComplete";
 import ResultsView from "@/components/ResultsView";
 import { buildMetrics } from "@/lib/analyze";
 import { computeStability, StabilityResult } from "@/lib/score";
+import { computePopulationComparison, PopulationResult } from "@/lib/population";
 import {
   clearRecordings,
   computeBaseline,
@@ -28,6 +29,7 @@ export default function Home() {
     current: RecordingMetrics;
     baseline: Baseline;
     stability: StabilityResult;
+    population: PopulationResult;
     history: RecordingMetrics[];
   } | null>(null);
 
@@ -49,7 +51,8 @@ export default function Home() {
           setTakeScore(stability.score);
           setView("takeComplete");
         } else {
-          setResult({ current: finalMetrics, baseline, stability, history });
+          const population = computePopulationComparison(finalMetrics);
+          setResult({ current: finalMetrics, baseline, stability, population, history });
           setView("result");
         }
       } finally {
@@ -172,6 +175,7 @@ export default function Home() {
               current={result.current}
               baseline={result.baseline}
               stability={result.stability}
+              population={result.population}
               history={result.history}
               onRecordAgain={handleRecordAgain}
               onClearData={handleClearData}

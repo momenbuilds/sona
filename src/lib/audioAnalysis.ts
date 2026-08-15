@@ -23,6 +23,17 @@ const FRAME_MS = 20;
 const MIN_PAUSE_MS = 250;
 const LONG_PAUSE_SEC = 1.5;
 
+// Structural subset of AudioBuffer. analyzeAcoustics only ever touches these
+// four members, so a real AudioBuffer satisfies this for free in the browser,
+// and a plain object wrapping ffmpeg-decoded PCM satisfies it in Node (see
+// scripts/build-reference-stats.mts) — same analysis code, no duplication.
+export interface DecodedAudio {
+  sampleRate: number;
+  duration: number;
+  numberOfChannels: number;
+  getChannelData(channel: number): Float32Array;
+}
+
 export async function decodeAudio(blob: Blob): Promise<AudioBuffer> {
   const arrayBuffer = await blob.arrayBuffer();
   const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -35,7 +46,7 @@ export async function decodeAudio(blob: Blob): Promise<AudioBuffer> {
   }
 }
 
-function getMonoSamples(buffer: AudioBuffer): Float32Array {
+function getMonoSamples(buffer: DecodedAudio): Float32Array {
   if (buffer.numberOfChannels === 1) return buffer.getChannelData(0);
   const ch0 = buffer.getChannelData(0);
   const ch1 = buffer.getChannelData(1);
@@ -101,7 +112,7 @@ function detectPitch(frame: Float32Array, sampleRate: number): number | null {
   return sampleRate / bestLag;
 }
 
-export function analyzeAcoustics(buffer: AudioBuffer): AcousticFeatures {
+export function analyzeAcoustics(buffer: DecodedAudio): AcousticFeatures {
   const samples = getMonoSamples(buffer);
   const sampleRate = buffer.sampleRate;
   const frameSize = Math.floor((FRAME_MS / 1000) * sampleRate);
