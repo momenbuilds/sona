@@ -1,6 +1,7 @@
 import { Baseline, MetricKey, RecordingMetrics } from "@/lib/types";
 import { StabilityResult, buildCognitiveFlag, buildInsights, buildNarrative, scoreLabel } from "@/lib/score";
 import { PopulationResult } from "@/lib/population";
+import { computeDementiaRisk } from "@/lib/dementiaRisk";
 import { BASELINE_MIN_COUNT } from "@/lib/storage";
 import StabilityGauge from "./StabilityGauge";
 import MetricCard from "./MetricCard";
@@ -9,6 +10,7 @@ import InsightList from "./InsightList";
 import PopulationSection from "./PopulationSection";
 import AnalysisSummary from "./AnalysisSummary";
 import CognitiveHealthNote from "./CognitiveHealthNote";
+import DementiaRiskCard from "./DementiaRiskCard";
 import HistoryChart from "./HistoryChart";
 import ShareCardButton from "./ShareCardButton";
 import Button from "./Button";
@@ -68,6 +70,7 @@ export default function ResultsView({
     enoughForComparisons
   );
   const cognitiveFlag = buildCognitiveFlag(history);
+  const dementiaRisk = computeDementiaRisk(current);
 
   const historyWordCounts = history.map((r) => r.wordCount).filter((v): v is number => v !== null);
   const totalWordsSpoken = historyWordCounts.length > 0 ? historyWordCounts.reduce((a, b) => a + b, 0) : null;
@@ -416,11 +419,13 @@ export default function ResultsView({
 
       <CognitiveHealthNote flag={cognitiveFlag} />
 
+      <DementiaRiskCard result={dementiaRisk} />
+
       <p className="text-center text-xs text-muted max-w-md mx-auto">
         This is an experimental speech-pattern demo, not a medical diagnosis or a screening tool.
-        Both comparisons above — against your own history and against the small general-speech
-        sample — are statistical, not clinical. Neither measures cognitive health, dementia risk,
-        or any other clinical marker.
+        The comparisons above — against your own history, against the small general-speech
+        sample, and the dementia risk estimate — are all statistical pattern-matching, not
+        clinical assessment. None of them are a substitute for talking to a doctor.
       </p>
     </div>
   );
